@@ -1,0 +1,4 @@
+Admin: admin@kartzo.com / Admin@123
+Demo User: demo_unique_123@example.com / Password@123
+SUMMER20
+WELCOME50

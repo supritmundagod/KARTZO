@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Kartzo'">Product Details</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --danger-color: #EF4444;
+            --dark-color: #111827;
+            --gray-color: #6B7280;
+            --light-gray: #F3F4F6;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-color);
+        }
+
+        .navbar {
+            background: linear-gradient(to right, var(--primary-color), var(--primary-hover));
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--white) !important;
+        }
+
+        .product-image-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .product-image-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        .product-info {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+
+        .price-tag {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .reviews-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .review-card {
+            border-bottom: 1px solid var(--light-gray);
+            padding: 1.5rem 0;
+        }
+
+        .review-card:last-child {
+            border-bottom: none;
+        }
+
+        .stars {
+            color: var(--accent-color);
+        }
+        
+        .empty-stars {
+            color: #E5E7EB;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .toast-container {
+            z-index: 1055;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bag-heart-fill me-2"></i>Kartzo
+            </a>
+            <div class="d-flex gap-3 align-items-center">
+                <a href="/" class="btn btn-outline-light"><i class="bi bi-arrow-left"></i> Back to Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row g-4">
+            <!-- Image -->
+            <div class="col-md-6">
+                <div class="product-image-container">
+                    <img th:src="${product.imageLink}" th:alt="${product.name}">
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="col-md-6">
+                <div class="product-info">
+                    <span class="badge bg-primary mb-2" th:text="${product.category}"></span>
+                    <h1 class="display-6 fw-bold mb-3" th:text="${product.name}"></h1>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stars fs-5 me-2">
+                            <i class="bi" th:each="i : ${#numbers.sequence(1, 5)}"
+                               th:classappend="${i <= product.averageRating ? 'bi-star-fill' : (i - 0.5 <= product.averageRating ? 'bi-star-half' : 'bi-star empty-stars')}">
+                            </i>
+                        </div>
+                        <span class="text-muted">(<span th:text="${product.reviewCount}"></span> reviews)</span>
+                    </div>
+
+                    <div class="price-tag mb-4">
+                        ₹<span th:text="${#numbers.formatDecimal(product.price, 0, 2)}"></span>
+                    </div>
+
+                    <p class="text-muted mb-4" th:text="${product.description}" style="line-height: 1.6;"></p>
+
+                    <p class="mb-4">
+                        <span th:if="${product.stock > 0}" class="text-success"><i class="bi bi-check-circle-fill"></i> In Stock (<span th:text="${product.stock}"></span> available)</span>
+                        <span th:if="${product.stock < 1}" class="text-danger"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a th:if="${product.stock >= 1}" th:href="'/user/add-cart/'+${product.id}" class="btn btn-success btn-lg">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </a>
+                        <a th:href="'/user/wishlist/add/'+${product.id}" class="btn btn-outline-danger btn-lg">
+                            <i class="bi bi-heart"></i> Save for Later
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="reviews-section">
+                    <h3 class="fw-bold mb-4">Customer Reviews</h3>
+
+                    <!-- Add Review Form -->
+                    <div th:if="${canReview}" class="card mb-4 border-0 bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Write a Review</h5>
+                            <form th:action="'/product/' + ${product.id} + '/review'" method="post">
+                                <div class="mb-3">
+                                    <label class="form-label">Rating</label>
+                                    <select name="rating" class="form-select w-auto" required>
+                                        <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                                        <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                                        <option value="3">⭐⭐⭐ (3/5)</option>
+                                        <option value="2">⭐⭐ (2/5)</option>
+                                        <option value="1">⭐ (1/5)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Your Review</label>
+                                    <textarea name="comment" class="form-control" rows="3" required placeholder="What did you like or dislike?"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Existing Reviews -->
+                    <div th:if="${product.reviews.empty}" class="text-muted py-3">
+                        <i class="bi bi-info-circle"></i> No reviews yet. Buy this product to be the first to review!
+                    </div>
+
+                    <div class="review-list">
+                        <div th:each="review : ${product.reviews}" class="review-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong><i class="bi bi-person-circle"></i> <span th:text="${review.user.name}"></span></strong>
+                                    <span class="text-muted ms-2 text-sm" th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}"></span>
+                                </div>
+                                <div class="stars">
+                                    <i class="bi bi-star-fill" th:each="i : ${#numbers.sequence(1, review.rating)}"></i><i class="bi bi-star empty-stars" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" th:if="${review.rating < 5}"></i>
+                                </div>
+                            </div>
+                            <p class="mb-0 text-muted" th:text="${review.comment}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            function showToast(message, type = 'success') {
+                if (!message) return;
+                const toastContainer = document.getElementById('toastContainer');
+                const toastElement = document.createElement('div');
+                toastElement.className = `toast align-items-center text-bg-${type} border-0 mb-2`;
+                toastElement.setAttribute('role', 'alert');
+                toastElement.setAttribute('aria-live', 'assertive');
+                toastElement.setAttribute('aria-atomic', 'true');
+                toastElement.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                `;
+                toastContainer.appendChild(toastElement);
+                const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 3000 });
+                toast.show();
+                toastElement.addEventListener('hidden.bs.toast', function() { toastElement.remove(); });
+            }
+            const success = /*[[${success}]]*/ null;
+            const error = /*[[${error}]]*/ null;
+            if (success) showToast(success, 'success');
+            if (error) showToast(error, 'danger');
+        });
+    </script>
+</body>
+</html>
